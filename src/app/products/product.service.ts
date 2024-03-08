@@ -1,43 +1,36 @@
 import { Injectable } from "@angular/core";
 import { IProduct } from "./IProduct";
+import { Observable, catchError, tap, throwError } from "rxjs";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
-    providedIn:"root"
+  providedIn: "root"
 })
 export class ProductService {
+  private productUrl = 'api/products/products.json';
 
-    getProducts(): IProduct[] {
-        return [
-            {
-                "productId": 2,
-                "productName": "Garden Cart",
-                "productCode": "GDN-0023",
-                "releaseDate": "March 18, 2021",
-                "description": "15 gallon capacity rolling garden cart",
-                "price": 32.99,
-                "starRating": 4.2,
-                "imageUrl": "assets/images/garden_cart.png"
-              },
-              {
-                "productId": 5,
-                "productName": "Hammer",
-                "productCode": "TBX-0048",
-                "releaseDate": "May 21, 2021",
-                "description": "Curved claw steel hammer",
-                "price": 8.9,
-                "starRating": 4.8,
-                "imageUrl": "assets/images/hammer.png"
-              },
-              {
-                "productId": 8,
-                "productName": "Saw",
-                "productCode": "TBX-0022",
-                "releaseDate": "May 15, 2021",
-                "description": "15-inch steel blade hand saw",
-                "price": 11.55,
-                "starRating": 3.7,
-                "imageUrl": "assets/images/saw.png"
-              },
-        ]
+  constructor(private http: HttpClient) { }
+
+  getProducts(): Observable<IProduct[]> {
+    return this.http.get<IProduct[]>(this.productUrl).pipe(
+      tap(data => console.log('All', JSON.stringify(data))),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(err: HttpErrorResponse) {
+    // in a real world app, we may send the server some remote logging infrastructure
+    // instead of just logging it to the console
+    let errorMessage = '';
+    if (err.error instanceof ErrorEvent) {
+      // A client-side of network error occurred. Handle it accordingly
+      errorMessage = `An error occurred: ${err.error.message}`;
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      errorMessage = `Server returned code: ${err.status}, error message is: ${err.message}`;
     }
+    console.error(errorMessage);
+    return throwError(() => errorMessage);
+  }
 }
