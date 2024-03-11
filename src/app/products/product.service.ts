@@ -18,7 +18,7 @@ export class ProductService {
     );
   }
 
-  private handleError(err: HttpErrorResponse) {
+  private handleError(err: HttpErrorResponse) {``
     // in a real world app, we may send the server some remote logging infrastructure
     // instead of just logging it to the console
     let errorMessage = '';
