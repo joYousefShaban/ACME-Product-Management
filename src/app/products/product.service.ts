@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { IProduct } from "./IProduct";
-import { Observable, catchError, tap, throwError } from "rxjs";
+import { Observable, catchError, map, tap, throwError } from "rxjs";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -18,7 +18,18 @@ export class ProductService {
     );
   }
 
-  private handleError(err: HttpErrorResponse) {``
+  DoesIDExist(id: number): Observable<boolean> {
+    return this.http.get<IProduct[]>(this.productUrl).pipe(
+      map(data => {
+        const product = data.find(product => product.productId === id);
+        return product !== undefined;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(err: HttpErrorResponse) {
+    ``
     // in a real world app, we may send the server some remote logging infrastructure
     // instead of just logging it to the console
     let errorMessage = '';
