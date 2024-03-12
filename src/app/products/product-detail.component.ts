@@ -1,31 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IProduct } from './IProduct';
+import { ProductService } from './product.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css']
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
   pageTitle: string = "Product Detail";
   product: IProduct | undefined;
+  sub!: Subscription;
 
   constructor(private route: ActivatedRoute,
-    private router: Router) { }
+    private router: Router,
+    private productService: ProductService) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get("id"));
     this.pageTitle += `: ${id}`;
-    this.product = {
-      "productId": 8,
-      "productName": "Saw",
-      "productCode": "TBX-0022",
-      "releaseDate": "May 15, 2021",
-      "description": "15-inch steel blade hand saw",
-      "price": 11.55,
-      "starRating": 3.7,
-      "imageUrl": "assets/images/saw.png"
-    }
+
+    this.sub = this.productService.getProductById(id).subscribe({
+      next: product => {
+        this.product = product;
+        console.log('Product:', product);
+      },
+      error: error => {
+        console.error('Error:', error);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   onBack(): void {

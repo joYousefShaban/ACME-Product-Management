@@ -18,15 +18,22 @@ export class ProductService {
     );
   }
 
-  DoesIDExist(id: number): Observable<boolean> {
+  getProductById(id: number): Observable<IProduct> {
     return this.http.get<IProduct[]>(this.productUrl).pipe(
-      map(data => {
-        const product = data.find(product => product.productId === id);
-        return product !== undefined;
-      }),
+      map(products => products.filter(product => product.productId === id)[0]), // Using filter and selecting the first element
       catchError(this.handleError)
     );
   }
+
+    DoesIDExist(id: number): Observable < boolean > {
+      return this.http.get<IProduct[]>(this.productUrl).pipe(
+        map(data => {
+          const product = data.find(product => product.productId === id);
+          return product !== undefined;
+        }),
+        catchError(this.handleError)
+      );
+    }
 
   private handleError(err: HttpErrorResponse) {
     ``
